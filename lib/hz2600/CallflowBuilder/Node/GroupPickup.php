@@ -16,14 +16,25 @@ class GroupPickup extends AbstractNode
         $this->module = "group_pickup";
     }
 
-    public function numbers($value = array()){
-        $this->data->numbers = $value;
+    public function user($id){
+        $this->data->user_id = $id;
         return $this;
     }
 
-    public function contactList($value = array()){
-        $this->data->contact_list = $value;
+    public function device($id){
+        $this->data->device_id = $id;
         return $this;
     }
+
+    public function group($id){
+        $this->data->group_id = $id;
+        return $this;
+    }
+
+    public function name($name){
+        $this->data->name = $name;
+        return $this;
+    }
+
 }
 
