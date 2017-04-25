@@ -82,8 +82,8 @@ abstract class AbstractCollection extends AbstractResource implements Iterator, 
      *
      *
      */
-    public function fetch(array $filter = array()) {
-        $response = $this->get($this->getFilter($filter));
+    public function fetch(array $filter = array(), $append_uri = '') {
+        $response = $this->get($this->getFilter($filter), $append_uri);
         $this->setCollection($response->getData());
         $this->rewind();
         return $this;
