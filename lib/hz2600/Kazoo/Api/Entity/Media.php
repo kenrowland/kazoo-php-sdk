@@ -10,18 +10,26 @@ class Media extends AbstractEntity
      * @param  boolean $stream  Set to true to stream the file
      * @return binary           Media file
      */
-    public function getRaw($stream = false)
+    public function getRaw($stream = false, $justData = false)
     {
         $this->setTokenValue($this->getEntityIdName(), $this->getId());
         $uri = $this->getURI('/raw');
         $x   = $this->getSDK()->get($uri, array(), array('accept'=>'*/*', 'content_type'=>'audio/*'));
 
-        header('Content-Type: '.$x->getHeader('Content-Type')[0]);
-        header('content-length: '.$x->getHeader('content-length')[0]);
+        if ($justData) {
+            header('Content-Type: ' . $x->getHeader('Content-Type')[0]);
+            header('content-length: ' . $x->getHeader('content-length')[0]);
+        }
 
-        if (!$stream) {
+        if (!$stream && !$justData) {
             header('Content-Disposition: '.$x->getHeader('Content-Disposition')[0]);
         }
+
+        if ($justData)
+        {
+            return $x->getBody();
+        }
+
         echo $x->getBody();
     }
 
