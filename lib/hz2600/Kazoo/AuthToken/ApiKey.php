@@ -5,6 +5,8 @@ namespace Kazoo\AuthToken;
 use \stdClass;
 
 use \Kazoo\SDK;
+use \Kazoo\AuthToken\PhpSessionHandler as PhpSessionHandler;
+use \Kazoo\AuthToken\SessionHandler as SessionHandler;
 
 /**
  *
@@ -36,13 +38,24 @@ class ApiKey implements AuthTokenInterface
     private $disabled = false;
 
     /**
+     * @var SessionHandler
+     *
+     * Handler for saving auth token to the session
+     */
+    private $sessionHandler = null;
+
+    /**
      *
      * @param string $username
      * @param string $password
      * @param string $sipRealm
      */
-    public function __construct($api_key) {
-        @session_start();
+    public function __construct($api_key, $sessionHandler=null) {
+        if ($sessionHandler == null)
+            $this->sessionHandler = new PhpSessionHandler();
+        else
+            $this->sessionHandler = $sessionHandler;
+        $this->sessionHandler->sessionStart();
         $this->api_key = $api_key;
     }
 
@@ -52,7 +65,7 @@ class ApiKey implements AuthTokenInterface
      */
     public function __destruct() {
         if (!is_null($this->auth_response)) {
-            $_SESSION['Kazoo']['AuthToken']['ApiKey'] = $this->auth_response;
+            $this->sessionHandler->put('Kazoo.AuthToken.ApiKey', $this->auth_response);
         }
     }
 
@@ -102,8 +115,8 @@ class ApiKey implements AuthTokenInterface
      */
     public function reset() {
         $this->auth_response = null;
-        if (isset($_SESSION['Kazoo']['AuthToken']['ApiKey'])) {
-            unset($_SESSION['Kazoo']['AuthToken']['ApiKey']);
+        if ($this->sessionHandler->isValueSet('Kazoo.AuthToken.ApiKey')) {
+            $this->sessionHandler->forget('Kazoo.AuthToken.ApiKey');
         }
     }
 
@@ -124,8 +137,8 @@ class ApiKey implements AuthTokenInterface
      *
      */
     private function checkSessionResponse() {
-        if (isset($_SESSION['Kazoo']['AuthToken']['ApiKey'])) {
-            $this->auth_response = $_SESSION['Kazoo']['AuthToken']['ApiKey'];
+        if ($this->sessionHandler->isValueSet('Kazoo.AuthToken.ApiKey')) {
+            $this->auth_response = $this->sessionHandler->get('Kazoo.AuthToken.ApiKey');
         } else {
             $this->requestToken();
         }
