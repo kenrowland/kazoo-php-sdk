@@ -5,6 +5,8 @@ namespace Kazoo\AuthToken;
 use \stdClass;
 
 use \Kazoo\SDK;
+use \Kazoo\AuthToken\PhpSessionHandler as PhpSessionHandler;
+use \Kazoo\AuthToken\SessionHandler as SessionHandler;
 
 /**
  *
@@ -31,17 +33,28 @@ class Manual implements AuthTokenInterface
     private $sdk;
 
     /**
+     * @var SessionHandler
+     *
+     * Handler for saving auth token to the session
+     */
+    private $sessionHandler = null;
+
+    /**
      * __construct
      *
      * @param string $auth_token
      * @param string $account_id
      * @return AuthToken\Manual
      */
-    public function __construct($auth_token, $account_id = null){
-        @session_start();
+    public function __construct($auth_token, $account_id = null, $sessionHandler=null){
+        if ($sessionHandler == null)
+            $this->sessionHandler = new PhpSessionHandler();
+        else
+            $this->sessionHandler = $sessionHandler;
+        $this->sessionHandler->sessionStart();
         $this->setToken($auth_token);
         $this->setAccountId($account_id);
-        $_SESSION['Kazoo']['AuthToken']['Manual'] = $auth_token;
+        $this->sessionHandler->put('Kazoo.AuthToken.Manual', $auth_token);
     }
 
 
@@ -102,8 +115,8 @@ class Manual implements AuthTokenInterface
      *
      */
     public function reset() {
-        if (isset($_SESSION['Kazoo']['AuthToken']['Manual'])) {
-            unset($_SESSION['Kazoo']['AuthToken']['Manual']);
+        if ($this->sessionHandler->isValueSet('Kazoo.AuthToken.Manual')) {
+            $this->sessionHandler->forget('Kazoo.AuthToken.Manual');
         }
     }
 }

@@ -5,6 +5,8 @@ namespace Kazoo\AuthToken;
 use \stdClass;
 
 use \Kazoo\SDK;
+use \Kazoo\AuthToken\PhpSessionHandler as PhpSessionHandler;
+use \Kazoo\AuthToken\SessionHandler as SessionHandler;
 
 /**
  *
@@ -56,6 +58,12 @@ class User implements AuthTokenInterface
      */
     private $credentials_hash = '';
 
+    /**
+     * @var SessionHandler
+     *
+     * Handler for saving auth token to the session
+     */
+    private $sessionHandler = null;
 
     /**
      *
@@ -63,8 +71,12 @@ class User implements AuthTokenInterface
      * @param string $password
      * @param string $sipRealm
      */
-    public function __construct($username, $password, $sipRealm) {
-        @session_start();
+    public function __construct($username, $password, $sipRealm, $sessionHandler=null) {
+        if ($sessionHandler == null)
+            $this->sessionHandler = new PhpSessionHandler();
+        else
+            $this->sessionHandler = $sessionHandler;
+        $this->sessionHandler->sessionStart();
         $this->username = $username;
         $this->password = $password;
         $this->sipRealm = $sipRealm;
@@ -76,7 +88,7 @@ class User implements AuthTokenInterface
      */
     public function __destruct() {
         if (!is_null($this->auth_response)) {
-            $_SESSION['Kazoo']['AuthToken']['User'] = $this->auth_response;
+            $this->sessionHandler->put('Kazoo.AuthToken.User', $this->auth_response);
         }
     }
 
@@ -138,9 +150,8 @@ class User implements AuthTokenInterface
      */
     public function reset() {
         $this->auth_response = null;
-        if (isset($_SESSION['Kazoo']['AuthToken']['User'])) {
-            unset($_SESSION['Kazoo']['AuthToken']['User']);
-        }
+        if ($this->sessionHandler->isValueSet('Kazoo.AuthToken.User'))
+            $this->sessionHandler->forget('Kazoo.AuthToken.User');
     }
 
     /**
@@ -160,8 +171,8 @@ class User implements AuthTokenInterface
      *
      */
     private function checkSessionResponse() {
-        if (isset($_SESSION['Kazoo']['AuthToken']['User'])) {
-            $this->auth_response = $_SESSION['Kazoo']['AuthToken']['User'];
+        if ($this->sessionHandler->isValueSet('Kazoo.AuthToken.User')) {
+            $this->auth_response = $this->sessionHandler->get('Kazoo.AuthToken.User');
         } else {
             $this->requestToken();
         }
