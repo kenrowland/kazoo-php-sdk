@@ -182,7 +182,8 @@ abstract class AbstractEntity extends AbstractResource
 
         $this->setTokenValue($this->getEntityIdName(), $id);
 
-        $response = $this->patch($payload, $append_uri);
+        //$response = $this->patch($payload, $append_uri);
+        $response = parent::patch($payload, $append_uri);
 
         $entity = $response->getData();
         $this->setEntity($entity);
