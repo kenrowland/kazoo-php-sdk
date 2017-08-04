@@ -8,7 +8,7 @@ class Accounts extends AbstractCollection
      *
      *
      */
-    public function fetch(array $filter = array()) {
+    public function fetch(array $filter = array(), $append_uri = '') {
         $this->children($filter);
         return $this;
     }
