@@ -72,6 +72,11 @@ class ElementWrapper
         throw new ReadOnly("Collection elements are read-only");
     }
 
+
+    public function __isset($name) {
+        return isset($this->getElement()->$name);
+    }
+
     /**
      *
      *
