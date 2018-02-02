@@ -4,7 +4,6 @@ namespace Kazoo\Api\Entity;
 
 class Media extends AbstractEntity
 {
-
     /**
      * downloads or streams a media file
      * @param  boolean $stream  Set to true to stream the file
@@ -30,7 +29,6 @@ class Media extends AbstractEntity
 
         echo $x->getBody();
     }
-
 
     /**
      * posts media file
