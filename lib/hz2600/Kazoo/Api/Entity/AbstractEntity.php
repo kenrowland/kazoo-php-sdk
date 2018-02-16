@@ -194,6 +194,42 @@ abstract class AbstractEntity extends AbstractResource
         return $this;
     }
 
+
+    /**
+     * @param $append_uri sub object append uri with leading /
+     * @return mixed
+     *
+     * Fetches a sub object of the entity w/o overwriting the stored entity
+     */
+    public function fetchObject($append_uri) {
+        $this->setTokenValue($this->getEntityIdName(), $this->getId());
+
+        $response = $this->get(array(), $append_uri);
+        $data = $response->getData();
+        return $data;
+    }
+
+
+    /**
+     * @param $append_uri sub object append uri with leading /
+     * @param $data new object
+     * @return mixed
+     *
+     * Save new sub object to the entity, entity not updated
+     */
+    public function saveObject($append_uri, $data) {
+        $this->setTokenValue($this->getEntityIdName(), $this->getId());
+
+        $shell = new stdClass();
+        $shell->data = $data;
+        $payload = json_encode($shell);
+
+        $response = $this->post($payload, $append_uri);
+        $resp = $response->getData();
+        return $resp;
+    }
+
+
     public function partialUpdate($append_uri){
         if ($this->read_only) {
             throw new ReadOnly("The entity is read-only");
