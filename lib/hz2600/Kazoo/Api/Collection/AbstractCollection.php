@@ -37,6 +37,12 @@ abstract class AbstractCollection extends AbstractResource implements Iterator, 
      */
     private $default_filter = array();
 
+
+    private $next_start_key = '';
+    private $page_size = 0;
+    private $start_key = '';
+    private $append_uri = '';
+
     /**
      *
      *
@@ -86,7 +92,47 @@ abstract class AbstractCollection extends AbstractResource implements Iterator, 
         $response = $this->get($this->getFilter($filter), $append_uri);
         $this->setCollection($response->getData());
         $this->rewind();
+        $this->savePageInfo($response, $append_uri);
         return $this;
+    }
+
+
+    public function fetchNext()
+    {
+        if ($this->page_size == 0)
+            throw new \RuntimeException("Cannot fetch next w/o initial paged fetch");
+
+        if ($this->next_start_key == '')
+            throw new \RuntimeException("At end of Collection, not more results");
+
+        $filter = array ('page_size' => $this->page_size, 'start_key' => $this->next_start_key);
+        return $this->fetch($filter, $this->append_uri);
+    }
+
+
+    public function isComplete()
+    {
+        if ($this->page_size == 0)
+            throw new \RuntimeException("Cannot test collection complete w/o initial paged fetch");
+
+        return $this->next_start_key != '';
+    }
+
+
+    private function savePageInfo($response, $append_uri)
+    {
+        $body = $response->getJson();
+        if (isset($body->next_start_key))
+        {
+            $this->start_key = $body->start_key;
+            $this->next_start_key = $body->next_start_key;
+            $this->page_size = $body->page_size;
+            $this->append_uri = $append_uri;
+        }
+        else
+        {
+            $this->next_start_key = '';
+        }
     }
 
     /**
