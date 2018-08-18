@@ -112,25 +112,23 @@ abstract class AbstractCollection extends AbstractResource implements Iterator, 
 
     public function isComplete()
     {
-        if ($this->page_size == 0)
-            throw new \RuntimeException("Cannot test collection complete w/o initial paged fetch");
-
-        return $this->next_start_key != '';
+        return $this->next_start_key == '';
     }
 
 
     private function savePageInfo($response, $append_uri)
     {
         $body = $response->getJson();
-        if (isset($body->next_start_key))
+        if (isset($body->page_size))
         {
-            $this->start_key = $body->start_key;
-            $this->next_start_key = $body->next_start_key;
             $this->page_size = $body->page_size;
             $this->append_uri = $append_uri;
+            $this->start_key = @$body->start_key ?: '';
+            $this->next_start_key = @$body->next_start_key ?: '';
         }
         else
         {
+            $this->page_size = 0;
             $this->next_start_key = '';
         }
     }
