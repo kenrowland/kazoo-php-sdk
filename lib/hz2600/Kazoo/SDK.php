@@ -12,6 +12,7 @@ use Kazoo\AuthToken\AuthTokenInterface;
 use Kazoo\AuthToken\Exception\Unauthenticated;
 use Kazoo\HttpClient\HttpClient;
 use Kazoo\HttpClient\HttpClientInterface;
+use Kazoo\HttpClient\Exception\ServerErrorResponse;
 
 /**
  * PHP Kazoo SDK
@@ -258,6 +259,7 @@ class SDK implements ChainableInterface
      * @param array  $parameters     GET parameters.
      * @param array  $requestHeaders Request Headers.
      * @return \Kazoo\HttpClient\Message\Response
+     * @throws ServerErrorResponse
      */
     public function get($uri, array $parameters = array(), $requestHeaders = array()) {
         try {
@@ -265,6 +267,16 @@ class SDK implements ChainableInterface
         } catch (Unauthenticated $e) {
             $this->auth_token->reset();
             return $this->executeGet($uri, $parameters, $requestHeaders);
+        } catch (ServerErrorResponse $e) {
+            //
+            // If a datastore fault, sleep a few seconds to allow the server cached to fill, then retry
+            // but only once.
+            if ($e->getMessage() == 'datastore_fault')
+            {
+                sleep(2);
+                return $this->executeGet($uri, $parameters, $requestHeaders);
+            }
+            throw $e;
         }
     }
 

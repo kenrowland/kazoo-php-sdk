@@ -6,6 +6,7 @@ index.php
 composer.lock
 vendor/
 vendor/*
+.idea/*
 *~
 lib/hz2600/Kazoo/Tests/phpunit.xml
 .idea/deployment.xml
