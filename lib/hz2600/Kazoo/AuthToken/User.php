@@ -87,9 +87,11 @@ class User implements AuthTokenInterface
      *
      */
     public function __destruct() {
-        if (!is_null($this->auth_response)) {
-            $this->sessionHandler->put('Kazoo.AuthToken.User', $this->auth_response);
-        }
+        // The response is now saved each time it is acquired. Necessary to handle long running processes
+        // that may incur an unauthorized response
+        //if (!is_null($this->auth_response)) {
+        //    $this->sessionHandler->put('Kazoo.AuthToken.User', $this->auth_response);
+        //}
     }
 
     /**
@@ -150,8 +152,7 @@ class User implements AuthTokenInterface
      */
     public function reset() {
         $this->auth_response = null;
-        if ($this->sessionHandler->isValueSet('Kazoo.AuthToken.User'))
-            $this->sessionHandler->forget('Kazoo.AuthToken.User');
+        $this->sessionHandler->forget('Kazoo.AuthToken.User');
     }
 
     /**
@@ -175,6 +176,10 @@ class User implements AuthTokenInterface
             $this->auth_response = $this->sessionHandler->get('Kazoo.AuthToken.User');
         } else {
             $this->requestToken();
+
+            //
+            // Save the token
+            $this->sessionHandler->put('Kazoo.AuthToken.User', $this->auth_response);
         }
     }
 

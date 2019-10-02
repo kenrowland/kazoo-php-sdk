@@ -64,9 +64,10 @@ class ApiKey implements AuthTokenInterface
      *
      */
     public function __destruct() {
-        if (!is_null($this->auth_response)) {
-            $this->sessionHandler->put('Kazoo.AuthToken.ApiKey', $this->auth_response);
-        }
+        // Saving here is not sufficient for long running process
+//        if (!is_null($this->auth_response)) {
+//            $this->sessionHandler->put('Kazoo.AuthToken.ApiKey', $this->auth_response);
+//        }
     }
 
     /**
@@ -141,6 +142,9 @@ class ApiKey implements AuthTokenInterface
             $this->auth_response = $this->sessionHandler->get('Kazoo.AuthToken.ApiKey');
         } else {
             $this->requestToken();
+            //
+            // Save the token
+            $this->sessionHandler->put('Kazoo.AuthToken.User', $this->auth_response);
         }
     }
 
