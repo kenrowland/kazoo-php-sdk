@@ -144,7 +144,7 @@ class ApiKey implements AuthTokenInterface
             $this->requestToken();
             //
             // Save the token
-            $this->sessionHandler->put('Kazoo.AuthToken.User', $this->auth_response);
+            $this->sessionHandler->put('Kazoo.AuthToken.ApiKey', $this->auth_response);
         }
     }
 
