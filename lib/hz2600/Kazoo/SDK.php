@@ -273,7 +273,8 @@ class SDK implements ChainableInterface
             // but only once.
             if ($e->getMessage() == 'datastore_fault')
             {
-                sleep(5);
+                set_time_limit(30);   // add another 30 seconds just in case
+                sleep(20);            // let's sleep a bit and retry (should not count against the time limit above)
                 return $this->executeGet($uri, $parameters, $requestHeaders);
             }
             throw $e;

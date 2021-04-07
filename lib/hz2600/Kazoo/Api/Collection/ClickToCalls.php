@@ -1,7 +1,7 @@
 <?php
 namespace Kazoo\Api\Collection;
 
-class Clicktocalls extends AbstractCollection
+class ClickToCalls extends AbstractCollection
 {
     /**
      *
