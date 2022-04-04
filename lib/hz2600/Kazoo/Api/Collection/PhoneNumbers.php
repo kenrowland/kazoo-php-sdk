@@ -80,7 +80,7 @@ class PhoneNumbers extends AbstractCollection
      *
      *
      */
-    public function fetch(array $filter = array()) {
+    public function fetch(array $filter = array(), $append_uri = '') {
         $response = $this->get($this->getFilter($filter));
         $data = $response->getData();
         $this->setCollection($data->numbers);
