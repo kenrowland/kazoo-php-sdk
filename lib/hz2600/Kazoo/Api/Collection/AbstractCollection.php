@@ -2,6 +2,7 @@
 
 namespace Kazoo\Api\Collection;
 
+use Exception;
 use \Iterator;
 use \Countable;
 use \ArrayAccess;
@@ -10,6 +11,7 @@ use \Kazoo\Common\Utils;
 use \Kazoo\Common\ChainableInterface;
 use \Kazoo\Common\Exception\ReadOnlyException;
 use \Kazoo\Api\AbstractResource;
+use stdClass;
 
 abstract class AbstractCollection extends AbstractResource implements Iterator, Countable, ArrayAccess
 {
