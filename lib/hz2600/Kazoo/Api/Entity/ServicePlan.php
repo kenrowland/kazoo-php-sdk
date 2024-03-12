@@ -4,7 +4,7 @@ namespace Kazoo\Api\Entity;
 class ServicePlan extends AbstractEntity
 {
     public function current() {
-        $this->read_only = TRUE;
+        $this->read_only_resource = TRUE;
         return $this->fetch('/current');
     }
 

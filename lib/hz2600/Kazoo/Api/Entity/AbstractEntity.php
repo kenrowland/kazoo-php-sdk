@@ -11,7 +11,7 @@ use \Kazoo\Common\Utils;
 use \Kazoo\Common\ChainableInterface;
 use \Kazoo\HttpClient\Message\Response;
 use \Kazoo\Api\AbstractResource;
-use \Kazoo\Common\Exception\ReadOnly;
+use \Kazoo\Common\Exception\ReadOnlyException;
 
 abstract class AbstractEntity extends AbstractResource
 {
@@ -31,7 +31,7 @@ abstract class AbstractEntity extends AbstractResource
      *
      *
      */
-    protected $read_only;
+    protected $read_only_resource;
 
     /**
      *
@@ -94,8 +94,8 @@ abstract class AbstractEntity extends AbstractResource
      *
      */
     public function __set($name, $value) {
-        if ($this->read_only) {
-            throw new ReadOnly("The entity is read-only");
+        if ($this->read_only_resource) {
+            throw new ReadOnlyException("The entity is read-only");
         }
 
         if(is_null($this->entity)) {
@@ -136,8 +136,8 @@ abstract class AbstractEntity extends AbstractResource
      *
      */
     public function __unset($name) {
-        if ($this->read_only) {
-            throw new ReadOnly("The entity is read-only");
+        if ($this->read_only_resource) {
+            throw new ReadOnlyException("The entity is read-only");
         }
 
         unset($this->entity->$name);
@@ -154,7 +154,7 @@ abstract class AbstractEntity extends AbstractResource
 
         $this->setId();
     }
-    
+
      /**
      * downloads or streams a media file
      * @param  boolean $stream  Set to true to stream the file
@@ -231,8 +231,8 @@ abstract class AbstractEntity extends AbstractResource
 
 
     public function partialUpdate($append_uri){
-        if ($this->read_only) {
-            throw new ReadOnly("The entity is read-only");
+        if ($this->read_only_resource) {
+            throw new ReadOnlyException("The entity is read-only");
         }
 
         $id = $this->getId();
@@ -255,8 +255,8 @@ abstract class AbstractEntity extends AbstractResource
      *
      */
     public function save($append_uri = null) {
-        if ($this->read_only) {
-            throw new ReadOnly("The entity is read-only");
+        if ($this->read_only_resource) {
+            throw new ReadOnlyException("The entity is read-only");
         }
 
         $id = $this->getId();
@@ -277,8 +277,8 @@ abstract class AbstractEntity extends AbstractResource
     }
 
     public function update($append_uri = null) {
-        if ($this->read_only) {
-            throw new ReadOnly("The entity is read-only");
+        if ($this->read_only_resource) {
+            throw new ReadOnlyException("The entity is read-only");
         }
 
         $id = $this->getId();
@@ -303,8 +303,8 @@ abstract class AbstractEntity extends AbstractResource
      *
      */
     public function remove($append_uri = null) {
-        if ($this->read_only) {
-            throw new ReadOnly("The entity is read-only");
+        if ($this->read_only_resource) {
+            throw new ReadOnlyException("The entity is read-only");
         }
 
         $this->setTokenValue($this->getEntityIdName(), $this->getId());
@@ -461,15 +461,15 @@ abstract class AbstractEntity extends AbstractResource
      *
      */
     protected function readWrite() {
-        $this->read_only = FALSE;
+        $this->read_only_resource = FALSE;
     }
 
     /**
      *
      *
      */
-    protected function readOnly() {
-        $this->read_only = TRUE;
+    protected function readOnlyResource() {
+        $this->read_only_resource = TRUE;
     }
 
     // auto-create nodes for this->k1->k2->k3 = v1

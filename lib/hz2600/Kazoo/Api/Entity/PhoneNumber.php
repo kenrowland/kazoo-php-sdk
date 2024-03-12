@@ -5,7 +5,7 @@ use \stdClass;
 
 use \kazoo\HttpClient\Exception\HttpException;
 
-use \Kazoo\Common\Exception\ReadOnly;
+use \Kazoo\Common\Exception\ReadOnlyException;
 
 class PhoneNumber extends AbstractEntity
 {
@@ -58,7 +58,7 @@ class PhoneNumber extends AbstractEntity
      */
     public function identify() {
         $this->fetch('/identify');
-        $this->readOnly();
+        $this->readOnlyResource();
         return $this;
     }
 
@@ -85,8 +85,8 @@ class PhoneNumber extends AbstractEntity
      *
      */
     public function save($append_uri = null) {
-        if ($this->read_only) {
-            throw new ReadOnly("The entity is read-only");
+        if ($this->read_only_resource) {
+            throw new ReadOnlyException("The entity is read-only");
         }
 
         $id = $this->getId();
