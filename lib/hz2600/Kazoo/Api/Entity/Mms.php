@@ -15,7 +15,16 @@ class Mms extends AbstractEntity
     {
         if ($this->to && $this->from && $this->body)
         {
-            $payload = "{ \"data\":{ \"to\": \"{$this->to}\", \"from\": \"{$this->from}\", \"body\": \"{$this->body}\" } }";
+            $payLoadData = [
+                'data' => [
+                    'to' => $this->to,
+                    'from' => $this->from,
+                    'body' => $this->body
+                ]
+            ];
+
+            //$payload = "{ \"data\":{ \"to\": \"{$this->to}\", \"from\": \"{$this->from}\", \"body\": \"{$this->body}\" } }";
+            $payload = json_encode($payLoadData);
             return $payload;
         }
         else
